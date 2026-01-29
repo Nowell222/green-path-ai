@@ -2,95 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* JuanLessTrash - Municipal Waste Management System Design System
+   Eco-friendly, professional, and accessible design language */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Core eco-friendly palette */
+    --background: 0 0% 98%;
+    --foreground: 160 10% 15%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 160 10% 15%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 160 10% 15%;
+    
+    /* Primary: Forest Green - represents sustainability */
+    --primary: 152 60% 32%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary: Soft Gray Green */
+    --secondary: 150 15% 93%;
+    --secondary-foreground: 152 60% 25%;
+    
+    --muted: 150 10% 94%;
+    --muted-foreground: 160 10% 45%;
+    
+    --accent: 152 40% 90%;
+    --accent-foreground: 152 60% 25%;
+    
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 150 15% 88%;
+    --input: 150 15% 88%;
+    --ring: 152 60% 32%;
+    
+    --radius: 0.625rem;
+    
+    /* Waste Categories - Color Tokens */
+    --waste-recyclable: 210 90% 50%;
+    --waste-recyclable-foreground: 0 0% 100%;
+    --waste-biodegradable: 142 70% 40%;
+    --waste-biodegradable-foreground: 0 0% 100%;
+    --waste-residual: 220 10% 25%;
+    --waste-residual-foreground: 0 0% 100%;
+    --waste-hazardous: 35 95% 55%;
+    --waste-hazardous-foreground: 0 0% 10%;
+    --waste-special: 280 60% 55%;
+    --waste-special-foreground: 0 0% 100%;
+    
+    /* Status Colors */
+    --status-success: 142 70% 40%;
+    --status-warning: 38 95% 50%;
+    --status-error: 0 72% 51%;
+    --status-info: 210 90% 50%;
+    
+    /* Truck Status Colors */
+    --truck-active: 142 70% 45%;
+    --truck-delayed: 38 95% 50%;
+    --truck-issue: 0 72% 51%;
+    --truck-completed: 210 90% 50%;
+    
+    /* Sidebar */
+    --sidebar-background: 152 30% 12%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 152 60% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 30% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 152 20% 20%;
+    --sidebar-ring: 152 60% 50%;
+    
+    /* Chart colors */
+    --chart-1: 152 60% 45%;
+    --chart-2: 210 90% 55%;
+    --chart-3: 38 95% 55%;
+    --chart-4: 280 60% 55%;
+    --chart-5: 0 72% 55%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --background: 160 15% 8%;
+    --foreground: 0 0% 95%;
+    
+    --card: 160 15% 10%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 160 15% 10%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 152 55% 45%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 160 15% 15%;
+    --secondary-foreground: 152 40% 70%;
+    
+    --muted: 160 15% 15%;
+    --muted-foreground: 160 10% 60%;
+    
+    --accent: 160 15% 18%;
+    --accent-foreground: 152 40% 70%;
+    
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 160 15% 18%;
+    --input: 160 15% 18%;
+    --ring: 152 55% 45%;
+    
+    --sidebar-background: 160 20% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 152 55% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 160 20% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 160 15% 15%;
+    --sidebar-ring: 152 55% 50%;
   }
 }
 
@@ -100,6 +130,125 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Card styles */
+  .card-eco {
+    @apply bg-card rounded-xl border border-border shadow-sm transition-all duration-200;
+  }
+  
+  .card-eco:hover {
+    @apply shadow-md border-primary/20;
+  }
+  
+  /* Status badges */
+  .badge-recyclable {
+    @apply bg-[hsl(var(--waste-recyclable))] text-[hsl(var(--waste-recyclable-foreground))] px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-biodegradable {
+    @apply bg-[hsl(var(--waste-biodegradable))] text-[hsl(var(--waste-biodegradable-foreground))] px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-residual {
+    @apply bg-[hsl(var(--waste-residual))] text-[hsl(var(--waste-residual-foreground))] px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-hazardous {
+    @apply bg-[hsl(var(--waste-hazardous))] text-[hsl(var(--waste-hazardous-foreground))] px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  /* Truck status indicators */
+  .truck-status-active {
+    @apply bg-[hsl(var(--truck-active))] h-3 w-3 rounded-full animate-pulse;
+  }
+  
+  .truck-status-delayed {
+    @apply bg-[hsl(var(--truck-delayed))] h-3 w-3 rounded-full;
+  }
+  
+  .truck-status-issue {
+    @apply bg-[hsl(var(--truck-issue))] h-3 w-3 rounded-full animate-pulse;
+  }
+  
+  .truck-status-completed {
+    @apply bg-[hsl(var(--truck-completed))] h-3 w-3 rounded-full;
+  }
+  
+  /* Stats card */
+  .stats-card {
+    @apply bg-card border border-border rounded-xl p-5 transition-all duration-200 hover:shadow-md;
+  }
+  
+  /* Gradient backgrounds */
+  .gradient-eco {
+    @apply bg-gradient-to-br from-[hsl(152,60%,32%)] to-[hsl(152,50%,22%)];
+  }
+  
+  .gradient-eco-light {
+    @apply bg-gradient-to-br from-[hsl(152,40%,95%)] to-[hsl(152,30%,88%)];
+  }
+  
+  /* Map container */
+  .map-container {
+    @apply rounded-xl overflow-hidden border border-border bg-muted;
+  }
+  
+  /* Progress bars */
+  .progress-eco {
+    @apply h-2 rounded-full bg-muted overflow-hidden;
+  }
+  
+  .progress-eco-fill {
+    @apply h-full rounded-full bg-primary transition-all duration-500;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+  }
+  
+  /* Animations */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .animate-truck {
+    animation: truck-move 2s ease-in-out infinite;
+  }
+  
+  @keyframes truck-move {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
   }
 }
