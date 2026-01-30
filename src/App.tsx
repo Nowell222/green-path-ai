@@ -16,8 +16,8 @@ import TruckTracking from "./pages/citizen/TruckTracking";
 import CollectionSchedule from "./pages/citizen/CollectionSchedule";
 import CitizenReports from "./pages/citizen/CitizenReports";
 import CitizenChat from "./pages/citizen/CitizenChat";
-import CitizenAchievements from "./pages/citizen/CitizenAchievements";
 import CitizenLearn from "./pages/citizen/CitizenLearn";
+import EarlyCollectionRequest from "./pages/citizen/EarlyCollectionRequest";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -36,6 +36,14 @@ import DriverRoute from "./pages/driver/DriverRoute";
 import DriverCollections from "./pages/driver/DriverCollections";
 import DriverIssues from "./pages/driver/DriverIssues";
 import DriverMessages from "./pages/driver/DriverMessages";
+
+// Barangay Pages
+import BarangayDashboard from "./pages/barangay/BarangayDashboard";
+import BarangayRequests from "./pages/barangay/BarangayRequests";
+import BarangayResidents from "./pages/barangay/BarangayResidents";
+import BarangayForward from "./pages/barangay/BarangayForward";
+import BarangayAnalytics from "./pages/barangay/BarangayAnalytics";
+import BarangaySettings from "./pages/barangay/BarangaySettings";
 
 const queryClient = new QueryClient();
 
@@ -79,8 +87,8 @@ function AppRoutes() {
       <Route path="/citizen/schedule" element={<ProtectedRoute allowedRoles={['citizen']}><CollectionSchedule /></ProtectedRoute>} />
       <Route path="/citizen/reports" element={<ProtectedRoute allowedRoles={['citizen']}><CitizenReports /></ProtectedRoute>} />
       <Route path="/citizen/chat" element={<ProtectedRoute allowedRoles={['citizen']}><CitizenChat /></ProtectedRoute>} />
-      <Route path="/citizen/achievements" element={<ProtectedRoute allowedRoles={['citizen']}><CitizenAchievements /></ProtectedRoute>} />
       <Route path="/citizen/learn" element={<ProtectedRoute allowedRoles={['citizen']}><CitizenLearn /></ProtectedRoute>} />
+      <Route path="/citizen/request" element={<ProtectedRoute allowedRoles={['citizen']}><EarlyCollectionRequest /></ProtectedRoute>} />
       
       {/* Admin Routes */}
       <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
@@ -99,6 +107,14 @@ function AppRoutes() {
       <Route path="/driver/collections" element={<ProtectedRoute allowedRoles={['driver']}><DriverCollections /></ProtectedRoute>} />
       <Route path="/driver/issues" element={<ProtectedRoute allowedRoles={['driver']}><DriverIssues /></ProtectedRoute>} />
       <Route path="/driver/messages" element={<ProtectedRoute allowedRoles={['driver']}><DriverMessages /></ProtectedRoute>} />
+      
+      {/* Barangay Routes */}
+      <Route path="/barangay" element={<ProtectedRoute allowedRoles={['barangay']}><BarangayDashboard /></ProtectedRoute>} />
+      <Route path="/barangay/requests" element={<ProtectedRoute allowedRoles={['barangay']}><BarangayRequests /></ProtectedRoute>} />
+      <Route path="/barangay/residents" element={<ProtectedRoute allowedRoles={['barangay']}><BarangayResidents /></ProtectedRoute>} />
+      <Route path="/barangay/forward" element={<ProtectedRoute allowedRoles={['barangay']}><BarangayForward /></ProtectedRoute>} />
+      <Route path="/barangay/analytics" element={<ProtectedRoute allowedRoles={['barangay']}><BarangayAnalytics /></ProtectedRoute>} />
+      <Route path="/barangay/settings" element={<ProtectedRoute allowedRoles={['barangay']}><BarangaySettings /></ProtectedRoute>} />
       
       {/* 404 */}
       <Route path="*" element={<NotFound />} />

@@ -4,6 +4,7 @@ import CitizenLayout from '@/components/layouts/CitizenLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { 
   Truck, 
   Calendar, 
@@ -11,11 +12,11 @@ import {
   MapPin, 
   Clock, 
   Recycle, 
-  Leaf, 
-  Trophy,
+  Leaf,
   ArrowRight,
-  Sparkles,
-  TrendingUp
+  TrendingUp,
+  Send,
+  Gauge
 } from 'lucide-react';
 
 // Mock data
@@ -31,6 +32,7 @@ const truckStatus = {
   driver: 'Juan Santos',
   stopsAway: 4,
   eta: '18 minutes',
+  loadCapacity: 78, // percentage full
 };
 
 const wasteStats = {
@@ -42,12 +44,6 @@ const wasteStats = {
   rank: 47,
   totalUsers: 823,
 };
-
-const achievements = [
-  { name: 'Recycling Champion', icon: Recycle, unlocked: true },
-  { name: 'Perfect Segregation', icon: Sparkles, unlocked: true },
-  { name: 'Community Reporter', icon: Trophy, unlocked: true },
-];
 
 export default function CitizenDashboard() {
   const { user } = useAuth();
@@ -97,13 +93,13 @@ export default function CitizenDashboard() {
             </Card>
           </Link>
 
-          <Link to="/citizen/schedule">
-            <Card className="card-eco group cursor-pointer h-full">
+          <Link to="/citizen/request">
+            <Card className="card-eco group cursor-pointer h-full border-primary/30">
               <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                <div className="w-12 h-12 rounded-xl bg-waste-biodegradable/10 flex items-center justify-center group-hover:bg-waste-biodegradable group-hover:text-waste-biodegradable-foreground transition-colors">
-                  <Calendar className="w-6 h-6 text-waste-biodegradable group-hover:text-waste-biodegradable-foreground" />
+                <div className="w-12 h-12 rounded-xl bg-[hsl(var(--status-warning))]/10 flex items-center justify-center group-hover:bg-[hsl(var(--status-warning))] transition-colors">
+                  <Send className="w-6 h-6 text-[hsl(var(--status-warning))] group-hover:text-white" />
                 </div>
-                <p className="font-medium text-sm">Schedule</p>
+                <p className="font-medium text-sm">Early Pickup</p>
               </CardContent>
             </Card>
           </Link>
@@ -167,7 +163,7 @@ export default function CitizenDashboard() {
             </CardContent>
           </Card>
 
-          {/* Truck Status Card */}
+          {/* Truck Status Card with Load */}
           <Card className="card-eco">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -196,15 +192,25 @@ export default function CitizenDashboard() {
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full" style={{ width: '75%' }} />
+              {/* Truck Load Status */}
+              <div className="p-3 rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm flex items-center gap-2">
+                    <Gauge className="w-4 h-4" />
+                    Truck Load Status
+                  </span>
+                  <Badge variant={truckStatus.loadCapacity > 90 ? 'destructive' : truckStatus.loadCapacity > 70 ? 'secondary' : 'default'}>
+                    {truckStatus.loadCapacity}% Full
+                  </Badge>
                 </div>
-                <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                  <span>Start</span>
-                  <span>Your Location</span>
-                  <span>End</span>
-                </div>
+                <Progress value={truckStatus.loadCapacity} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {truckStatus.loadCapacity > 90 
+                    ? 'Truck is almost full' 
+                    : truckStatus.loadCapacity > 70 
+                    ? 'Limited capacity remaining' 
+                    : 'Plenty of space available'}
+                </p>
               </div>
 
               <Button className="w-full" asChild>
@@ -218,9 +224,9 @@ export default function CitizenDashboard() {
         </div>
 
         {/* Stats Section */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Waste Breakdown */}
-          <Card className="card-eco lg:col-span-2">
+          <Card className="card-eco">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-display flex items-center gap-2">
                 <Recycle className="w-5 h-5 text-primary" />
@@ -277,11 +283,11 @@ export default function CitizenDashboard() {
             </CardContent>
           </Card>
 
-          {/* Community Ranking */}
+          {/* Community Ranking - Simplified without Achievements */}
           <Card className="card-eco">
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-display flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-waste-hazardous" />
+                <TrendingUp className="w-5 h-5 text-primary" />
                 Community Ranking
               </CardTitle>
             </CardHeader>
@@ -295,18 +301,16 @@ export default function CitizenDashboard() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Recent Achievements</p>
-                {achievements.map((achievement, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <achievement.icon className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium">{achievement.name}</span>
-                    <span className="ml-auto text-xs">⭐</span>
-                  </div>
-                ))}
+              <div className="p-4 rounded-lg bg-primary/5 text-center">
+                <p className="text-sm text-muted-foreground">Keep up the good work!</p>
+                <p className="text-lg font-bold text-primary mt-1">+15 positions this month</p>
               </div>
+
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/citizen/learn">
+                  Learn More Tips <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

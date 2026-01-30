@@ -29,10 +29,10 @@ const navItems = [
   { path: '/citizen', label: 'Home', icon: Home },
   { path: '/citizen/scanner', label: 'Waste Scanner', icon: Camera },
   { path: '/citizen/tracking', label: 'Track Truck', icon: MapPin },
+  { path: '/citizen/request', label: 'Early Pickup', icon: FileText },
   { path: '/citizen/schedule', label: 'Schedule', icon: Calendar },
   { path: '/citizen/reports', label: 'My Reports', icon: FileText },
   { path: '/citizen/chat', label: 'Ask WasteBot', icon: MessageSquare },
-  { path: '/citizen/achievements', label: 'Achievements', icon: Trophy },
   { path: '/citizen/learn', label: 'Learn', icon: BookOpen },
 ];
 
