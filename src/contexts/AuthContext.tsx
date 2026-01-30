@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-export type UserRole = 'citizen' | 'admin' | 'driver';
+export type UserRole = 'citizen' | 'admin' | 'driver' | 'barangay';
 
 export interface User {
   id: string;
@@ -57,6 +57,18 @@ const SAMPLE_USERS: Record<string, { password: string; user: User }> = {
       role: 'driver',
       phone: '0919-XXX-9012',
       truckId: 'TRK-247',
+      avatar: undefined,
+    },
+  },
+  'barangay@juanlesstrash.com': {
+    password: 'barangay123',
+    user: {
+      id: 'brgy-001',
+      email: 'barangay@juanlesstrash.com',
+      name: 'Kapitan Jose Mendoza',
+      role: 'barangay',
+      barangay: 'Brgy. San Jose',
+      phone: '0920-XXX-3456',
       avatar: undefined,
     },
   },
@@ -122,6 +134,7 @@ export function getRoleDisplayName(role: UserRole): string {
     citizen: 'Citizen',
     admin: 'MENRO Admin',
     driver: 'Truck Driver',
+    barangay: 'Barangay Official',
   };
   return names[role];
 }
@@ -132,6 +145,7 @@ export function getRoleDashboardPath(role: UserRole): string {
     citizen: '/citizen',
     admin: '/admin',
     driver: '/driver',
+    barangay: '/barangay',
   };
   return paths[role];
 }

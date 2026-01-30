@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import CitizenLayout from '@/components/layouts/CitizenLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Truck, 
   MapPin, 
@@ -10,8 +12,11 @@ import {
   Navigation,
   CheckCircle2,
   Circle,
-  User
+  User,
+  Gauge
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 // Mock data
 const truckInfo = {
@@ -39,9 +44,14 @@ const routeStops = [
 ];
 
 export default function TruckTracking() {
+  const [notifyEnabled, setNotifyEnabled] = useState(false);
   const completedStops = routeStops.filter(s => s.status === 'completed').length;
   const totalStops = routeStops.length;
   const progress = (completedStops / totalStops) * 100;
+
+  // Calculate positions for the visual route
+  const userStopIndex = routeStops.findIndex(s => s.name.includes('YOUR'));
+  const userPosition = ((userStopIndex + 0.5) / totalStops) * 100;
 
   return (
     <CitizenLayout>
@@ -51,38 +61,68 @@ export default function TruckTracking() {
             <h1 className="text-2xl font-display font-bold">Track Truck</h1>
             <p className="text-muted-foreground">Real-time garbage truck location</p>
           </div>
-          <Button variant="outline" size="sm">
-            <Bell className="w-4 h-4 mr-2" />
-            Notify Me
+          <Button 
+            variant={notifyEnabled ? "default" : "outline"} 
+            size="sm"
+            onClick={() => setNotifyEnabled(!notifyEnabled)}
+          >
+            <Bell className={cn("w-4 h-4 mr-2", notifyEnabled && "animate-pulse")} />
+            {notifyEnabled ? 'Notifications On' : 'Notify Me'}
           </Button>
         </div>
 
-        {/* Map Placeholder */}
+        {/* Enhanced Map Visualization */}
         <Card className="card-eco overflow-hidden">
-          <div className="aspect-video lg:aspect-[21/9] bg-muted relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
-            
-            {/* Fake map visualization */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                {/* Route line */}
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-primary/30 rounded-full" />
-                <div className="absolute top-1/2 left-0 h-1 bg-primary rounded-full" style={{ width: `${progress}%` }} />
+          <div className="aspect-video lg:aspect-[21/9] bg-gradient-to-b from-muted to-muted/50 relative">
+            {/* Simulated road/path background */}
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="w-full max-w-2xl relative">
+                {/* Route line background */}
+                <div className="absolute top-1/2 left-0 right-0 h-3 bg-muted-foreground/20 rounded-full transform -translate-y-1/2" />
                 
-                {/* Truck icon */}
+                {/* Completed route portion */}
                 <div 
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg animate-pulse"
+                  className="absolute top-1/2 left-0 h-3 bg-primary rounded-full transform -translate-y-1/2 transition-all duration-1000"
+                  style={{ width: `${progress}%` }}
+                />
+                
+                {/* Route dots */}
+                {routeStops.map((stop, idx) => {
+                  const position = ((idx + 0.5) / totalStops) * 100;
+                  return (
+                    <div 
+                      key={stop.id}
+                      className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2"
+                      style={{ left: `${position}%` }}
+                    >
+                      <div className={cn(
+                        "w-4 h-4 rounded-full border-2 border-background",
+                        stop.status === 'completed' && "bg-primary",
+                        stop.status === 'current' && "bg-[hsl(var(--status-warning))] animate-pulse",
+                        stop.status === 'upcoming' && "bg-muted-foreground/30"
+                      )} />
+                      {stop.name.includes('YOUR') && (
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                          <Badge variant="default" className="animate-bounce">📍 You</Badge>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                
+                {/* Moving Truck icon */}
+                <div 
+                  className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 transition-all duration-1000"
                   style={{ left: `${progress}%` }}
                 >
-                  <Truck className="w-5 h-5 text-primary-foreground" />
-                </div>
-                
-                {/* Your location marker */}
-                <div 
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-waste-recyclable rounded-full flex items-center justify-center shadow-lg"
-                  style={{ left: '71%' }}
-                >
-                  <MapPin className="w-4 h-4 text-primary-foreground" />
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                      <Truck className="w-6 h-6 text-primary-foreground" />
+                    </div>
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                      <span className="text-xs font-medium bg-background px-2 py-1 rounded shadow">{truckInfo.id}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -93,6 +133,14 @@ export default function TruckTracking() {
                 <Navigation className="w-4 h-4 mr-1" />
                 Center
               </Button>
+            </div>
+
+            {/* Live indicator */}
+            <div className="absolute top-4 left-4">
+              <Badge variant="destructive" className="animate-pulse">
+                <span className="w-2 h-2 bg-white rounded-full mr-2 animate-ping" />
+                LIVE
+              </Badge>
             </div>
           </div>
         </Card>
@@ -137,19 +185,29 @@ export default function TruckTracking() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Capacity: {truckInfo.capacity}% full</span>
-                <span>Speed: {truckInfo.speed}</span>
-              </div>
-
-              <div className="relative">
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full" style={{ width: `${truckInfo.capacity}%` }} />
+              {/* Truck Load Status */}
+              <div className="p-3 rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm flex items-center gap-2">
+                    <Gauge className="w-4 h-4" />
+                    Truck Load Capacity
+                  </span>
+                  <Badge variant={truckInfo.capacity > 90 ? 'destructive' : truckInfo.capacity > 70 ? 'secondary' : 'default'}>
+                    {truckInfo.capacity}% Full
+                  </Badge>
                 </div>
+                <Progress value={truckInfo.capacity} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {truckInfo.capacity > 90 
+                    ? '⚠️ Truck is almost full - may not collect all waste' 
+                    : truckInfo.capacity > 70 
+                    ? 'Limited capacity remaining' 
+                    : '✓ Plenty of space available'}
+                </p>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                Last update: {truckInfo.lastUpdate}
+                Last update: {truckInfo.lastUpdate} • Speed: {truckInfo.speed}
               </p>
             </CardContent>
           </Card>
