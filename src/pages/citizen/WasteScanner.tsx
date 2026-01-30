@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import fastFoodCupImage from '@/assets/fastfood-cup-sample.jpg';
 
 // Static informational text for fast food cups
 const FAST_FOOD_CUP_INFO = {
@@ -55,7 +56,6 @@ export default function WasteScanner() {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const startCamera = useCallback(async () => {
     setCameraError(null);
@@ -101,17 +101,11 @@ export default function WasteScanner() {
     }
   }, [stopCamera]);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setCapturedImage(e.target?.result as string);
-        setShowResult(true);
-        toast.success('Image uploaded successfully!');
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleUploadImage = () => {
+    // Automatically show the sample fast food cup image
+    setCapturedImage(fastFoodCupImage);
+    setShowResult(true);
+    toast.success('Image uploaded successfully!');
   };
 
   const handleReset = () => {
@@ -241,19 +235,11 @@ export default function WasteScanner() {
                   size="lg" 
                   variant="outline" 
                   className="h-14"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={handleUploadImage}
                 >
                   <Upload className="w-5 h-5 mr-2" />
                   Upload Image
                 </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
               </div>
             )}
 
