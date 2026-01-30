@@ -18,7 +18,13 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
-// Mock data
+// San Juan, Batangas coordinates (approximate)
+const SAN_JUAN_BATANGAS = {
+  center: { lat: 13.8261, lng: 121.3956 },
+  name: 'San Juan, Batangas'
+};
+
+// Mock data with GPS coordinates
 const truckInfo = {
   id: 'TRK-247',
   driver: 'Juan Santos',
@@ -31,16 +37,17 @@ const truckInfo = {
   lastUpdate: '3 sec ago',
   eta: '18 minutes',
   stopsAway: 4,
+  currentLocation: { lat: 13.8245, lng: 121.3920, address: 'Purok 4, Brgy. Poblacion' },
 };
 
 const routeStops = [
-  { id: 1, name: 'Purok 1', status: 'completed', time: '6:02 PM' },
-  { id: 2, name: 'Purok 2', status: 'completed', time: '6:08 PM' },
-  { id: 3, name: 'Purok 3', status: 'completed', time: '6:15 PM' },
-  { id: 4, name: 'Purok 4', status: 'current', time: null },
-  { id: 5, name: 'Purok 5 - YOUR LOCATION', status: 'upcoming', time: null },
-  { id: 6, name: 'Purok 6', status: 'upcoming', time: null },
-  { id: 7, name: 'Purok 7', status: 'upcoming', time: null },
+  { id: 1, name: 'Purok 1, Brgy. Poblacion', status: 'completed', time: '6:02 PM', lat: 13.8200, lng: 121.3900 },
+  { id: 2, name: 'Purok 2, Brgy. Poblacion', status: 'completed', time: '6:08 PM', lat: 13.8215, lng: 121.3910 },
+  { id: 3, name: 'Purok 3, Brgy. Poblacion', status: 'completed', time: '6:15 PM', lat: 13.8230, lng: 121.3915 },
+  { id: 4, name: 'Purok 4, Brgy. Poblacion', status: 'current', time: null, lat: 13.8245, lng: 121.3920 },
+  { id: 5, name: 'Purok 5 - YOUR LOCATION', status: 'upcoming', time: null, lat: 13.8260, lng: 121.3940 },
+  { id: 6, name: 'Purok 6, Brgy. Poblacion', status: 'upcoming', time: null, lat: 13.8275, lng: 121.3955 },
+  { id: 7, name: 'Purok 7, Brgy. Poblacion', status: 'upcoming', time: null, lat: 13.8290, lng: 121.3970 },
 ];
 
 export default function TruckTracking() {
@@ -51,7 +58,6 @@ export default function TruckTracking() {
 
   // Calculate positions for the visual route
   const userStopIndex = routeStops.findIndex(s => s.name.includes('YOUR'));
-  const userPosition = ((userStopIndex + 0.5) / totalStops) * 100;
 
   return (
     <CitizenLayout>
@@ -59,7 +65,7 @@ export default function TruckTracking() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display font-bold">Track Truck</h1>
-            <p className="text-muted-foreground">Real-time garbage truck location</p>
+            <p className="text-muted-foreground">Real-time GPS tracking in {SAN_JUAN_BATANGAS.name}</p>
           </div>
           <Button 
             variant={notifyEnabled ? "default" : "outline"} 
@@ -71,22 +77,45 @@ export default function TruckTracking() {
           </Button>
         </div>
 
-        {/* Enhanced Map Visualization */}
+        {/* Enhanced Map Visualization with Route Line */}
         <Card className="card-eco overflow-hidden">
           <div className="aspect-video lg:aspect-[21/9] bg-gradient-to-b from-muted to-muted/50 relative">
-            {/* Simulated road/path background */}
+            {/* Map Background (simulated) */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMDA4IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
+            
+            {/* Location label */}
+            <div className="absolute top-4 right-4 bg-background/90 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2">
+              <MapPin className="w-3 h-3 text-primary" />
+              {SAN_JUAN_BATANGAS.name}
+            </div>
+
+            {/* Simulated road/path */}
             <div className="absolute inset-0 flex items-center justify-center p-8">
               <div className="w-full max-w-2xl relative">
-                {/* Route line background */}
+                {/* Route line background (grey for incomplete) */}
                 <div className="absolute top-1/2 left-0 right-0 h-3 bg-muted-foreground/20 rounded-full transform -translate-y-1/2" />
                 
-                {/* Completed route portion */}
+                {/* Route line (green dashed for active route) */}
+                <svg className="absolute top-1/2 left-0 right-0 h-6 transform -translate-y-1/2" style={{ overflow: 'visible' }}>
+                  <line 
+                    x1="0%" 
+                    y1="50%" 
+                    x2={`${progress}%`} 
+                    y2="50%" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth="4" 
+                    strokeDasharray="8 4"
+                    className="animate-pulse"
+                  />
+                </svg>
+                
+                {/* Completed route portion (solid) */}
                 <div 
                   className="absolute top-1/2 left-0 h-3 bg-primary rounded-full transform -translate-y-1/2 transition-all duration-1000"
                   style={{ width: `${progress}%` }}
                 />
                 
-                {/* Route dots */}
+                {/* Route dots/stops */}
                 {routeStops.map((stop, idx) => {
                   const position = ((idx + 0.5) / totalStops) * 100;
                   return (
@@ -96,31 +125,37 @@ export default function TruckTracking() {
                       style={{ left: `${position}%` }}
                     >
                       <div className={cn(
-                        "w-4 h-4 rounded-full border-2 border-background",
+                        "w-4 h-4 rounded-full border-2 border-background shadow-sm",
                         stop.status === 'completed' && "bg-primary",
                         stop.status === 'current' && "bg-[hsl(var(--status-warning))] animate-pulse",
                         stop.status === 'upcoming' && "bg-muted-foreground/30"
                       )} />
                       {stop.name.includes('YOUR') && (
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                          <Badge variant="default" className="animate-bounce">📍 You</Badge>
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                          <Badge variant="default" className="animate-bounce shadow-lg">
+                            📍 Your Location
+                          </Badge>
                         </div>
                       )}
                     </div>
                   );
                 })}
                 
-                {/* Moving Truck icon */}
+                {/* Moving Truck icon with animation */}
                 <div 
                   className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 transition-all duration-1000"
                   style={{ left: `${progress}%` }}
                 >
                   <div className="relative">
-                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                      <Truck className="w-6 h-6 text-primary-foreground" />
+                    <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-xl border-4 border-background">
+                      <Truck className="w-7 h-7 text-primary-foreground" />
                     </div>
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                      <span className="text-xs font-medium bg-background px-2 py-1 rounded shadow">{truckInfo.id}</span>
+                    {/* Pulse animation around truck */}
+                    <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                      <span className="text-xs font-bold bg-background px-3 py-1.5 rounded-full shadow-lg border">
+                        {truckInfo.id} • {truckInfo.speed}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -139,7 +174,7 @@ export default function TruckTracking() {
             <div className="absolute top-4 left-4">
               <Badge variant="destructive" className="animate-pulse">
                 <span className="w-2 h-2 bg-white rounded-full mr-2 animate-ping" />
-                LIVE
+                LIVE GPS
               </Badge>
             </div>
           </div>
@@ -183,6 +218,15 @@ export default function TruckTracking() {
                   <p className="text-2xl font-bold">{truckInfo.stopsAway}</p>
                   <p className="text-xs text-muted-foreground">Stops Away</p>
                 </div>
+              </div>
+
+              {/* Current Location */}
+              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <p className="text-xs text-muted-foreground mb-1">Current Location</p>
+                <p className="font-medium text-sm flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  {truckInfo.currentLocation.address}
+                </p>
               </div>
 
               {/* Truck Load Status */}
@@ -237,7 +281,10 @@ export default function TruckTracking() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${stop.name.includes('YOUR') ? 'text-primary' : ''}`}>
+                      <p className={cn(
+                        "text-sm font-medium",
+                        stop.name.includes('YOUR') && 'text-primary font-bold'
+                      )}>
                         {stop.name}
                       </p>
                       {stop.time && (
@@ -247,7 +294,7 @@ export default function TruckTracking() {
                         </p>
                       )}
                       {stop.status === 'current' && (
-                        <p className="text-xs text-primary font-medium">In Progress</p>
+                        <p className="text-xs text-primary font-medium">🚛 Truck is here</p>
                       )}
                     </div>
                   </div>

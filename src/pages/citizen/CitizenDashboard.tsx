@@ -11,12 +11,12 @@ import {
   Camera, 
   MapPin, 
   Clock, 
-  Recycle, 
-  Leaf,
   ArrowRight,
-  TrendingUp,
   Send,
-  Gauge
+  Gauge,
+  Bot,
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 
 // Mock data
@@ -32,17 +32,7 @@ const truckStatus = {
   driver: 'Juan Santos',
   stopsAway: 4,
   eta: '18 minutes',
-  loadCapacity: 78, // percentage full
-};
-
-const wasteStats = {
-  recyclable: 45,
-  biodegradable: 35,
-  residual: 20,
-  itemsScanned: 47,
-  co2Saved: 3.4,
-  rank: 47,
-  totalUsers: 823,
+  loadCapacity: 78,
 };
 
 export default function CitizenDashboard() {
@@ -63,7 +53,7 @@ export default function CitizenDashboard() {
             </div>
             <div className="hidden sm:block text-right">
               <p className="text-xs text-primary-foreground/70">Your Impact</p>
-              <p className="text-3xl font-bold">{wasteStats.co2Saved}kg</p>
+              <p className="text-3xl font-bold">3.4kg</p>
               <p className="text-xs text-primary-foreground/70">CO₂ saved this month</p>
             </div>
           </div>
@@ -115,6 +105,32 @@ export default function CitizenDashboard() {
             </Card>
           </Link>
         </div>
+
+        {/* WasteBot AI Widget */}
+        <Link to="/citizen/chat">
+          <Card className="card-eco hover:border-primary/50 transition-colors cursor-pointer">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                  <Bot className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display font-bold">WasteBot AI</h3>
+                    <Sparkles className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Ask me anything about waste management, recycling tips, or collection schedules!
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                  <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Next Collection Card */}
@@ -217,98 +233,6 @@ export default function CitizenDashboard() {
                 <Link to="/citizen/tracking">
                   <MapPin className="w-4 h-4 mr-2" />
                   Track on Map
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Waste Breakdown */}
-          <Card className="card-eco">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-display flex items-center gap-2">
-                <Recycle className="w-5 h-5 text-primary" />
-                Your Waste Breakdown
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-waste-recyclable/10 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Recyclable</span>
-                    <span className="font-bold text-waste-recyclable">{wasteStats.recyclable}%</span>
-                  </div>
-                  <Progress value={wasteStats.recyclable} className="h-2 bg-waste-recyclable/20" />
-                </div>
-                
-                <div className="p-4 rounded-xl bg-waste-biodegradable/10 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Biodegradable</span>
-                    <span className="font-bold text-waste-biodegradable">{wasteStats.biodegradable}%</span>
-                  </div>
-                  <Progress value={wasteStats.biodegradable} className="h-2 bg-waste-biodegradable/20" />
-                </div>
-                
-                <div className="p-4 rounded-xl bg-waste-residual/10 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Residual</span>
-                    <span className="font-bold text-waste-residual">{wasteStats.residual}%</span>
-                  </div>
-                  <Progress value={wasteStats.residual} className="h-2 bg-waste-residual/20" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{wasteStats.itemsScanned}</p>
-                    <p className="text-xs text-muted-foreground">Items scanned</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-waste-biodegradable/10 flex items-center justify-center">
-                    <Leaf className="w-5 h-5 text-waste-biodegradable" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{wasteStats.co2Saved}kg</p>
-                    <p className="text-xs text-muted-foreground">CO₂ saved</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Community Ranking - Simplified without Achievements */}
-          <Card className="card-eco">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-display flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Community Ranking
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center py-4">
-                <p className="text-5xl font-bold text-primary">#{wasteStats.rank}</p>
-                <p className="text-sm text-muted-foreground">of {wasteStats.totalUsers} citizens</p>
-                <div className="flex items-center justify-center gap-1 mt-2 text-truck-active">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm font-medium">Top 6%!</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-lg bg-primary/5 text-center">
-                <p className="text-sm text-muted-foreground">Keep up the good work!</p>
-                <p className="text-lg font-bold text-primary mt-1">+15 positions this month</p>
-              </div>
-
-              <Button variant="outline" className="w-full" asChild>
-                <Link to="/citizen/learn">
-                  Learn More Tips <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
             </CardContent>

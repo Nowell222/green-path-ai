@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import CitizenLayout from '@/components/layouts/CitizenLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Mock data
 const currentMonth = 'January 2026';
@@ -26,43 +28,55 @@ const scheduleData = {
   }
 };
 
-const calendarDays = [
+interface CalendarDay {
+  day: number;
+  type: 'collection' | 'today' | null;
+  details?: {
+    wasteTypes: string[];
+    time: string;
+    route: string;
+    truck: string;
+  };
+}
+
+const calendarDays: CalendarDay[] = [
   { day: 1, type: null },
   { day: 2, type: null },
   { day: 3, type: null },
   { day: 4, type: null },
   { day: 5, type: null },
-  { day: 6, type: 'collection' },
+  { day: 6, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 7, type: null },
   { day: 8, type: null },
-  { day: 9, type: 'collection' },
+  { day: 9, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 10, type: null },
   { day: 11, type: null },
   { day: 12, type: null },
-  { day: 13, type: 'collection' },
+  { day: 13, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-248' } },
   { day: 14, type: null },
   { day: 15, type: null },
-  { day: 16, type: 'collection' },
+  { day: 16, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 17, type: null },
   { day: 18, type: null },
   { day: 19, type: null },
-  { day: 20, type: 'collection' },
+  { day: 20, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-249' } },
   { day: 21, type: null },
   { day: 22, type: null },
-  { day: 23, type: 'collection' },
+  { day: 23, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 24, type: null },
   { day: 25, type: null },
   { day: 26, type: null },
-  { day: 27, type: 'collection' },
+  { day: 27, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 28, type: null },
   { day: 29, type: 'today' },
-  { day: 30, type: 'collection' },
+  { day: 30, type: 'collection', details: { wasteTypes: ['Recyclable', 'Biodegradable', 'Residual'], time: '6:00 PM - 8:00 PM', route: 'Route R-12', truck: 'TRK-247' } },
   { day: 31, type: null },
 ];
 
 const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 export default function CollectionSchedule() {
+  const [hoveredDay, setHoveredDay] = useState<CalendarDay | null>(null);
   const emptyDays = 3; // January 2026 starts on Thursday (index 4 - 1 = 3 empty)
 
   return (
@@ -145,19 +159,62 @@ export default function CollectionSchedule() {
               
               {/* Calendar days */}
               {calendarDays.map((day) => (
-                <button
-                  key={day.day}
-                  className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm transition-colors
-                    ${day.type === 'today' ? 'bg-primary text-primary-foreground font-bold' : ''}
-                    ${day.type === 'collection' ? 'bg-waste-biodegradable/10 text-waste-biodegradable font-medium hover:bg-waste-biodegradable/20' : ''}
-                    ${!day.type ? 'hover:bg-accent' : ''}
-                  `}
-                >
-                  {day.day}
-                  {day.type === 'collection' && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-waste-biodegradable mt-0.5" />
+                <Tooltip key={day.day}>
+                  <TooltipTrigger asChild>
+                    <button
+                      className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm transition-colors relative
+                        ${day.type === 'today' ? 'bg-primary text-primary-foreground font-bold' : ''}
+                        ${day.type === 'collection' ? 'bg-waste-biodegradable/10 text-waste-biodegradable font-medium hover:bg-waste-biodegradable/20' : ''}
+                        ${!day.type ? 'hover:bg-accent' : ''}
+                      `}
+                      onMouseEnter={() => day.type === 'collection' && setHoveredDay(day)}
+                      onMouseLeave={() => setHoveredDay(null)}
+                    >
+                      {day.day}
+                      {day.type === 'collection' && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-waste-biodegradable mt-0.5" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  {day.type === 'collection' && day.details && (
+                    <TooltipContent 
+                      side="top" 
+                      className="max-w-xs p-0 bg-card border shadow-lg"
+                    >
+                      <div className="p-3">
+                        <p className="font-bold text-sm mb-2">January {day.day}, 2026</p>
+                        <div className="space-y-2 text-xs">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3 h-3 text-primary" />
+                            <span>{day.details.time}</span>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground mb-1">Waste Types:</p>
+                            <div className="flex gap-1 flex-wrap">
+                              {day.details.wasteTypes.map((type) => (
+                                <span 
+                                  key={type} 
+                                  className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                    type === 'Recyclable' ? 'bg-waste-recyclable/20 text-waste-recyclable' :
+                                    type === 'Biodegradable' ? 'bg-waste-biodegradable/20 text-waste-biodegradable' :
+                                    'bg-waste-residual/20 text-waste-residual'
+                                  }`}
+                                >
+                                  {type}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <span>{day.details.route}</span>
+                            <span>•</span>
+                            <span>{day.details.truck}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </TooltipContent>
                   )}
-                </button>
+                </Tooltip>
               ))}
             </div>
 
@@ -165,7 +222,7 @@ export default function CollectionSchedule() {
             <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-border text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-waste-biodegradable" />
-                <span>Collection Day</span>
+                <span>Collection Day (hover for details)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-primary" />

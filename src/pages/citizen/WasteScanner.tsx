@@ -6,147 +6,52 @@ import {
   Camera, 
   Upload, 
   Zap, 
-  Recycle, 
-  Leaf, 
   Trash2, 
   AlertTriangle,
   MapPin,
   Share2,
   BookmarkPlus,
-  Sparkles,
-  CheckCircle2,
   Info,
   X,
   RotateCcw,
-  Loader2
+  Leaf,
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-interface ScanResult {
-  classification: string;
-  category: 'recyclable' | 'biodegradable' | 'residual' | 'hazardous';
-  confidence: number;
-  material: string;
-  condition: string;
-  disposalMethod: string[];
+// Static informational text for fast food cups
+const FAST_FOOD_CUP_INFO = {
+  title: "Fast Food Cup Analysis",
+  classification: "NON-BIODEGRADABLE / RESIDUAL WASTE",
+  description: "Fast food cups may look like paper but usually contain a plastic lining (polyethylene coating) that makes them waterproof. This plastic lining categorizes them as non-biodegradable and difficult to recycle.",
+  properties: [
+    "Material: Paper with polyethylene (PE) plastic lining",
+    "Recyclability: Difficult - most recycling facilities cannot separate the plastic lining",
+    "Biodegradability: Not compostable in regular composting conditions",
+    "Decomposition time: 20-30 years in landfills"
+  ],
+  environmentalImpact: "When disposed improperly, the plastic lining breaks down into microplastics that can contaminate soil and water. These microplastics affect soil quality and can be absorbed by plants, entering the food chain. The plastic residue also prevents natural decomposition of the paper component.",
+  disposalOptions: [
+    "✓ Treat as RESIDUAL WASTE - place in black bin",
+    "✓ Check for local specialized recycling programs that accept lined paper products",
+    "✓ Some facilities offer waste-to-energy processing for these items",
+    "✗ Do NOT place in regular paper recycling",
+    "✗ Do NOT compost - plastic will not break down"
+  ],
+  conclusion: "Fast food cups are NOT eco-friendly. The best environmental choice is to reduce the use of single-use cups by bringing your own reusable container or choosing to dine in with washable cups when possible.",
   nearestDropoff: {
-    name: string;
-    distance: string;
-    hours: string;
-  };
-  environmentalImpact: string;
-  didYouKnow: string;
-  points: number;
-}
-
-const mockResults: Record<string, ScanResult> = {
-  recyclable: {
-    classification: 'RECYCLABLE PLASTIC',
-    category: 'recyclable',
-    confidence: 94,
-    material: 'PET Plastic (#1)',
-    condition: 'Clean & Dry ✓',
-    disposalMethod: [
-      'Rinse thoroughly',
-      'Remove cap & label',
-      'Flatten bottle',
-      'Place in BLUE recycling bin'
-    ],
-    nearestDropoff: {
-      name: 'Barangay Recycling Center',
-      distance: '0.8 km away',
-      hours: 'Open until 5 PM'
-    },
-    environmentalImpact: 'Recycling this saves 30g CO₂',
-    didYouKnow: 'PET bottles can be recycled into clothing fibers and new containers!',
-    points: 5
-  },
-  biodegradable: {
-    classification: 'ORGANIC WASTE',
-    category: 'biodegradable',
-    confidence: 91,
-    material: 'Food Scraps',
-    condition: 'Suitable for composting ✓',
-    disposalMethod: [
-      'Separate from packaging',
-      'Place in GREEN biodegradable bin',
-      'Or add to home compost pile',
-      'Avoid mixing with plastics'
-    ],
-    nearestDropoff: {
-      name: 'Community Composting Center',
-      distance: '1.2 km away',
-      hours: 'Open until 4 PM'
-    },
-    environmentalImpact: 'Composting prevents methane emissions',
-    didYouKnow: 'Food waste in landfills produces harmful greenhouse gases!',
-    points: 3
-  },
-  hazardous: {
-    classification: 'HAZARDOUS WASTE',
-    category: 'hazardous',
-    confidence: 88,
-    material: 'Battery / E-Waste',
-    condition: 'Handle with care ⚠️',
-    disposalMethod: [
-      'Do NOT throw in regular bins',
-      'Store safely in container',
-      'Bring to designated drop-off point',
-      'Never burn or puncture'
-    ],
-    nearestDropoff: {
-      name: 'MENRO Hazardous Waste Collection',
-      distance: '2.5 km away',
-      hours: 'Saturdays 8 AM - 12 PM'
-    },
-    environmentalImpact: 'Proper disposal prevents soil and water contamination',
-    didYouKnow: 'One battery can contaminate 600,000 liters of water!',
-    points: 10
-  },
-  residual: {
-    classification: 'RESIDUAL WASTE',
-    category: 'residual',
-    confidence: 85,
-    material: 'Mixed Non-Recyclable',
-    condition: 'Non-recyclable material',
-    disposalMethod: [
-      'Ensure item cannot be recycled',
-      'Place in BLACK residual bin',
-      'Keep separate from recyclables',
-      'Compact to save space'
-    ],
-    nearestDropoff: {
-      name: 'Regular Collection Schedule',
-      distance: 'Next pickup: Tomorrow',
-      hours: 'Every Mon, Wed, Fri'
-    },
-    environmentalImpact: 'Reducing residual waste saves landfill space',
-    didYouKnow: 'Many items thought to be trash can actually be recycled!',
-    points: 2
+    name: 'Regular Residual Collection',
+    distance: 'Next pickup: Tomorrow',
+    hours: 'Every Mon, Wed, Fri'
   }
 };
 
-const categoryColors = {
-  recyclable: { bg: 'bg-[hsl(var(--waste-recyclable))]/10', text: 'text-[hsl(var(--waste-recyclable))]' },
-  biodegradable: { bg: 'bg-[hsl(var(--waste-biodegradable))]/10', text: 'text-[hsl(var(--waste-biodegradable))]' },
-  residual: { bg: 'bg-[hsl(var(--waste-residual))]/10', text: 'text-[hsl(var(--waste-residual))]' },
-  hazardous: { bg: 'bg-[hsl(var(--waste-hazardous))]/10', text: 'text-[hsl(var(--waste-hazardous))]' },
-};
-
-const categoryIcons = {
-  recyclable: Recycle,
-  biodegradable: Leaf,
-  residual: Trash2,
-  hazardous: AlertTriangle,
-};
-
 export default function WasteScanner() {
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
-  const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -190,7 +95,8 @@ export default function WasteScanner() {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImage(dataUrl);
         stopCamera();
-        analyzeImage();
+        setShowResult(true);
+        toast.success('Image captured!');
       }
     }
   }, [stopCamera]);
@@ -201,42 +107,29 @@ export default function WasteScanner() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setCapturedImage(e.target?.result as string);
-        analyzeImage();
+        setShowResult(true);
+        toast.success('Image uploaded successfully!');
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const analyzeImage = () => {
-    setIsScanning(true);
-    // Simulate AI analysis with random result
-    setTimeout(() => {
-      const categories = ['recyclable', 'biodegradable', 'hazardous', 'residual'] as const;
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      setScanResult(mockResults[randomCategory]);
-      setIsScanning(false);
-      toast.success('Scan complete!', { description: 'Waste item identified successfully' });
-    }, 2500);
-  };
-
   const handleReset = () => {
-    setScanResult(null);
     setCapturedImage(null);
     setShowCamera(false);
     setCameraError(null);
+    setShowResult(false);
   };
 
   const handleShare = () => {
-    if (scanResult) {
-      if (navigator.share) {
-        navigator.share({
-          title: 'JuanLessTrash Scan Result',
-          text: `I just identified ${scanResult.classification}. ${scanResult.environmentalImpact}`,
-          url: window.location.href
-        });
-      } else {
-        toast.success('Result copied to clipboard!');
-      }
+    if (navigator.share) {
+      navigator.share({
+        title: 'JuanLessTrash Scan Result',
+        text: `I just learned about fast food cup disposal! ${FAST_FOOD_CUP_INFO.conclusion}`,
+        url: window.location.href
+      });
+    } else {
+      toast.success('Result copied to clipboard!');
     }
   };
 
@@ -246,11 +139,7 @@ export default function WasteScanner() {
 
   const handleDirections = () => {
     toast.info('Opening maps...');
-    // In a real app, this would open Google Maps
   };
-
-  const CategoryIcon = scanResult ? categoryIcons[scanResult.category] : Recycle;
-  const colors = scanResult ? categoryColors[scanResult.category] : categoryColors.recyclable;
 
   return (
     <CitizenLayout>
@@ -260,7 +149,7 @@ export default function WasteScanner() {
           <p className="text-muted-foreground">Scan any item to learn how to dispose of it properly</p>
         </div>
 
-        {!scanResult ? (
+        {!showResult ? (
           <>
             {/* Camera View / Upload Area */}
             <Card className="card-eco overflow-hidden">
@@ -304,23 +193,11 @@ export default function WasteScanner() {
                       </div>
                     </>
                   ) : capturedImage ? (
-                    <>
-                      <img 
-                        src={capturedImage} 
-                        alt="Captured" 
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      {isScanning && (
-                        <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center">
-                          <div className="relative">
-                            <div className="w-24 h-24 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-                            <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-primary" />
-                          </div>
-                          <p className="mt-4 font-medium">Analyzing waste item...</p>
-                          <p className="text-sm text-muted-foreground">AI is identifying the material</p>
-                        </div>
-                      )}
-                    </>
+                    <img 
+                      src={capturedImage} 
+                      alt="Captured" 
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="text-center p-8">
                       {cameraError ? (
@@ -380,13 +257,6 @@ export default function WasteScanner() {
               </div>
             )}
 
-            {capturedImage && !isScanning && (
-              <Button variant="outline" className="w-full" onClick={handleReset}>
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Take Another Photo
-              </Button>
-            )}
-
             {/* Tips */}
             {!showCamera && !capturedImage && (
               <Card className="card-eco">
@@ -407,10 +277,10 @@ export default function WasteScanner() {
           </>
         ) : (
           <>
-            {/* Scan Result */}
+            {/* Scan Result - Static Fast Food Cup Info */}
             <Card className="card-eco overflow-hidden">
               {capturedImage && (
-                <div className="h-32 relative">
+                <div className="h-48 relative">
                   <img 
                     src={capturedImage} 
                     alt="Scanned item" 
@@ -419,43 +289,61 @@ export default function WasteScanner() {
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
                 </div>
               )}
-              <div className={cn("p-4", colors.bg)}>
+              
+              <div className="p-4 bg-[hsl(var(--waste-residual))]/10">
                 <div className="flex items-center gap-3">
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", colors.bg)}>
-                    <CategoryIcon className={cn("w-6 h-6", colors.text)} />
+                  <div className="w-12 h-12 rounded-xl bg-[hsl(var(--waste-residual))]/20 flex items-center justify-center">
+                    <Trash2 className="w-6 h-6 text-[hsl(var(--waste-residual))]" />
                   </div>
                   <div className="flex-1">
-                    <p className={cn("font-bold", colors.text)}>{scanResult.classification}</p>
-                    <p className="text-sm text-muted-foreground">{scanResult.material}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">{scanResult.confidence}%</p>
-                    <p className="text-xs text-muted-foreground">confidence</p>
+                    <p className="font-bold text-[hsl(var(--waste-residual))]">{FAST_FOOD_CUP_INFO.classification}</p>
+                    <p className="text-sm text-muted-foreground">{FAST_FOOD_CUP_INFO.title}</p>
                   </div>
                 </div>
               </div>
               
               <CardContent className="p-4 space-y-4">
-                {/* Condition */}
-                <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-[hsl(var(--status-success))]" />
-                  <span>Condition: {scanResult.condition}</span>
+                {/* Description */}
+                <div className="p-3 rounded-lg bg-muted/50">
+                  <p className="text-sm">{FAST_FOOD_CUP_INFO.description}</p>
                 </div>
 
-                {/* Disposal Method */}
+                {/* Properties */}
+                <div>
+                  <p className="font-medium mb-2 flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Material Properties
+                  </p>
+                  <div className="space-y-1">
+                    {FAST_FOOD_CUP_INFO.properties.map((prop, idx) => (
+                      <p key={idx} className="text-sm text-muted-foreground">• {prop}</p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Environmental Impact */}
+                <div className="p-3 rounded-lg bg-[hsl(var(--status-warning))]/10 border border-[hsl(var(--status-warning))]/20">
+                  <p className="font-medium mb-2 flex items-center gap-2 text-[hsl(var(--status-warning))]">
+                    <AlertCircle className="w-4 h-4" />
+                    Environmental Impact
+                  </p>
+                  <p className="text-sm">{FAST_FOOD_CUP_INFO.environmentalImpact}</p>
+                </div>
+
+                {/* Disposal Options */}
                 <div>
                   <p className="font-medium mb-2 flex items-center gap-2">
                     <Trash2 className="w-4 h-4" />
-                    Disposal Method
+                    Disposal Options
                   </p>
-                  <div className="space-y-2">
-                    {scanResult.disposalMethod.map((step, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-sm">
-                        <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center flex-shrink-0">
-                          {idx + 1}
-                        </span>
-                        <span>{step}</span>
-                      </div>
+                  <div className="space-y-1">
+                    {FAST_FOOD_CUP_INFO.disposalOptions.map((option, idx) => (
+                      <p key={idx} className={cn(
+                        "text-sm",
+                        option.startsWith('✓') ? 'text-[hsl(var(--status-success))]' : 'text-[hsl(var(--status-error))]'
+                      )}>
+                        {option}
+                      </p>
                     ))}
                   </div>
                 </div>
@@ -466,9 +354,9 @@ export default function WasteScanner() {
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
                       <div>
-                        <p className="font-medium text-sm">{scanResult.nearestDropoff.name}</p>
+                        <p className="font-medium text-sm">{FAST_FOOD_CUP_INFO.nearestDropoff.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {scanResult.nearestDropoff.distance} • {scanResult.nearestDropoff.hours}
+                          {FAST_FOOD_CUP_INFO.nearestDropoff.distance} • {FAST_FOOD_CUP_INFO.nearestDropoff.hours}
                         </p>
                       </div>
                     </div>
@@ -478,25 +366,15 @@ export default function WasteScanner() {
                   </div>
                 </div>
 
-                {/* Environmental Impact */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-[hsl(var(--waste-biodegradable))]/10">
-                  <Leaf className="w-5 h-5 text-[hsl(var(--waste-biodegradable))]" />
-                  <p className="text-sm font-medium">{scanResult.environmentalImpact}</p>
-                </div>
-
-                {/* Did You Know */}
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5">
-                  <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-medium text-primary">Did You Know?</p>
-                    <p className="text-sm">{scanResult.didYouKnow}</p>
+                {/* Conclusion */}
+                <div className="p-3 rounded-lg bg-[hsl(var(--waste-biodegradable))]/10">
+                  <div className="flex items-start gap-3">
+                    <Leaf className="w-5 h-5 text-[hsl(var(--waste-biodegradable))] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-medium text-[hsl(var(--waste-biodegradable))]">Better Choice</p>
+                      <p className="text-sm">{FAST_FOOD_CUP_INFO.conclusion}</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Points Earned */}
-                <div className="flex items-center justify-center gap-2 py-3 border-t border-border">
-                  <Sparkles className="w-5 h-5 text-[hsl(var(--waste-hazardous))]" />
-                  <span className="font-medium">+{scanResult.points} points for proper identification!</span>
                 </div>
               </CardContent>
             </Card>
@@ -504,7 +382,7 @@ export default function WasteScanner() {
             {/* Action Buttons */}
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={handleReset}>
-                <Camera className="w-4 h-4 mr-2" />
+                <RotateCcw className="w-4 h-4 mr-2" />
                 Scan Another
               </Button>
               <Button variant="outline" size="icon" onClick={handleSaveResult}>
