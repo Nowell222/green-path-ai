@@ -31,6 +31,7 @@ const DEMO_ACCOUNTS = [
     icon: Truck,
     description: 'Route management, collection tracking'
   },
+  
 ];
 
 export default function Login() {
