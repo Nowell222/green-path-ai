@@ -1,37 +1,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, getRoleDashboardPath } from '@/contexts/AuthContext';
+import { useAuth, getRoleDashboardPath, UserRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, Truck, Shield, Users, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Leaf, Truck, Shield, Users, Eye, EyeOff, AlertCircle, Building2, Briefcase, Recycle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DEMO_ACCOUNTS = [
-  { 
-    role: 'Citizen', 
-    email: 'citizen@juanlesstrash.com', 
-    password: 'citizen123',
-    icon: Users,
-    description: 'Access waste scanner, truck tracking, schedules'
-  },
-  { 
-    role: 'Admin', 
-    email: 'admin@juanlesstrash.com', 
-    password: 'admin123',
-    icon: Shield,
-    description: 'Fleet management, analytics, reports'
-  },
-  { 
-    role: 'Driver', 
-    email: 'driver@juanlesstrash.com', 
-    password: 'driver123',
-    icon: Truck,
-    description: 'Route management, collection tracking'
-  },
-  
+  { role: 'Citizen', email: 'citizen@juanlesstrash.com', password: 'citizen123', icon: Users, description: 'Waste scanner, truck tracking, schedules', userRole: 'citizen' as UserRole },
+  { role: 'MENRO Admin', email: 'admin@juanlesstrash.com', password: 'admin123', icon: Shield, description: 'Fleet management, analytics, reports', userRole: 'admin' as UserRole },
+  { role: 'Driver', email: 'driver@juanlesstrash.com', password: 'driver123', icon: Truck, description: 'Route management, collection tracking', userRole: 'driver' as UserRole },
+  { role: 'Super Admin', email: 'superadmin@juanlesstrash.com', password: 'superadmin123', icon: Shield, description: 'System-wide management, all organizations', userRole: 'superadmin' as UserRole },
+  { role: 'Hauling Admin', email: 'hauling@juanlesstrash.com', password: 'hauling123', icon: Building2, description: 'Eco-Aide & fleet management, hauling requests', userRole: 'hauling_admin' as UserRole },
+  { role: 'Business', email: 'business@juanlesstrash.com', password: 'business123', icon: Briefcase, description: 'Hauling requests, schedules, tracking', userRole: 'business' as UserRole },
+  { role: 'Eco-Aide', email: 'ecoaide@juanlesstrash.com', password: 'ecoaide123', icon: Recycle, description: 'On-demand pickup tasks, route navigation', userRole: 'ecoaide' as UserRole },
 ];
 
 export default function Login() {
@@ -45,71 +30,47 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
+    if (!email || !password) { setError('Please enter both email and password'); return; }
 
     const success = await login(email, password);
-    
     if (success) {
-      const userRecord = DEMO_ACCOUNTS.find(acc => acc.email.toLowerCase() === email.toLowerCase());
-      toast.success('Welcome back!', {
-        description: `Logged in as ${userRecord?.role || 'User'}`
-      });
-      
-      // Navigate based on role
-      const role = email.toLowerCase().includes('admin') ? 'admin' : 
-                   email.toLowerCase().includes('driver') ? 'driver' : 'citizen';
-      navigate(getRoleDashboardPath(role as any));
+      const account = DEMO_ACCOUNTS.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+      toast.success('Welcome back!', { description: `Logged in as ${account?.role || 'User'}` });
+      navigate(getRoleDashboardPath(account?.userRole || 'citizen'));
     } else {
       setError('Invalid email or password');
     }
   };
 
-  const handleDemoLogin = async (email: string, password: string) => {
-    setEmail(email);
-    setPassword(password);
+  const handleDemoLogin = async (account: typeof DEMO_ACCOUNTS[0]) => {
+    setEmail(account.email);
+    setPassword(account.password);
     setError('');
-    
-    const success = await login(email, password);
+    const success = await login(account.email, account.password);
     if (success) {
-      const role = email.toLowerCase().includes('admin') ? 'admin' : 
-                   email.toLowerCase().includes('driver') ? 'driver' : 'citizen';
       toast.success('Demo login successful!');
-      navigate(getRoleDashboardPath(role as any));
+      navigate(getRoleDashboardPath(account.userRole));
     }
   };
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
-      {/* Decorative Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-[hsl(150,40%,96%)] via-background to-[hsl(150,30%,92%)]" />
       <div className="absolute top-20 right-20 w-[500px] h-[500px] rounded-full border-[3px] border-primary/20 opacity-60 hidden lg:block" />
       <div className="absolute top-40 right-40 w-[400px] h-[400px] rounded-full border-2 border-primary/10 opacity-40 hidden lg:block" />
       <div className="absolute -bottom-20 -left-20 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl" />
       
-      {/* Floating Icons - matching reference */}
       <div className="absolute top-32 right-[28%] hidden lg:flex items-center justify-center w-12 h-12 rounded-xl bg-amber-100 text-amber-500 shadow-lg animate-float">
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
-        </svg>
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/></svg>
       </div>
       <div className="absolute top-[45%] right-[15%] hidden lg:flex items-center justify-center w-14 h-14 rounded-xl bg-sky-100 text-sky-500 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
-        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
       </div>
       <div className="absolute top-[25%] right-[12%] hidden lg:flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary shadow-lg animate-float" style={{ animationDelay: '0.5s' }}>
         <Leaf className="w-8 h-8" />
       </div>
 
-      {/* Left Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 relative z-10">
-        {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg">
@@ -141,57 +102,29 @@ export default function Login() {
               <Card className="border-border/50 shadow-xl bg-white/80 backdrop-blur-sm">
                 <CardHeader className="space-y-1 pb-4">
                   <CardTitle className="text-2xl font-display">Welcome back</CardTitle>
-                  <CardDescription>
-                    Enter your credentials to access your dashboard
-                  </CardDescription>
+                  <CardDescription>Enter your credentials to access your dashboard</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                        <AlertCircle className="w-4 h-4" />
-                        {error}
+                        <AlertCircle className="w-4 h-4" />{error}
                       </div>
                     )}
-                    
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-11 bg-white"
-                      />
+                      <Input id="email" type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 bg-white" />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="password">Password</Label>
                       <div className="relative">
-                        <Input
-                          id="password"
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="h-11 pr-10 bg-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
+                        <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 pr-10 bg-white" />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full h-11 font-medium shadow-lg shadow-primary/20"
-                      disabled={isLoading}
-                    >
+                    <Button type="submit" className="w-full h-11 font-medium shadow-lg shadow-primary/20" disabled={isLoading}>
                       {isLoading ? 'Signing in...' : 'Sign In'}
                     </Button>
                   </form>
@@ -203,26 +136,24 @@ export default function Login() {
               <Card className="border-border/50 shadow-xl bg-white/80 backdrop-blur-sm">
                 <CardHeader className="space-y-1 pb-4">
                   <CardTitle className="text-2xl font-display">Demo Accounts</CardTitle>
-                  <CardDescription>
-                    Click any account below to sign in instantly
-                  </CardDescription>
+                  <CardDescription>Click any account below to sign in instantly</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
                   {DEMO_ACCOUNTS.map((account) => (
                     <button
                       key={account.role}
-                      onClick={() => handleDemoLogin(account.email, account.password)}
+                      onClick={() => handleDemoLogin(account)}
                       disabled={isLoading}
-                      className="w-full p-4 rounded-xl border border-border/50 bg-white hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 text-left group disabled:opacity-50"
+                      className="w-full p-3 rounded-xl border border-border/50 bg-white hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 text-left group disabled:opacity-50"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                          <account.icon className="w-5 h-5" />
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                          <account.icon className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground">{account.role}</p>
-                          <p className="text-sm text-muted-foreground truncate">{account.email}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{account.description}</p>
+                          <p className="font-medium text-sm text-foreground">{account.role}</p>
+                          <p className="text-xs text-muted-foreground truncate">{account.email}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{account.description}</p>
                         </div>
                       </div>
                     </button>
@@ -233,7 +164,6 @@ export default function Login() {
           </Tabs>
         </div>
 
-        {/* Stats - matching reference */}
         <div className="flex items-center gap-8 mt-8 pt-6 border-t border-border/50">
           <div className="text-center">
             <p className="text-2xl font-display font-bold text-primary">45+</p>
