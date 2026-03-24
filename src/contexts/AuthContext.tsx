@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-export type UserRole = 'citizen' | 'admin' | 'driver' | 'barangay';
+export type UserRole = 'citizen' | 'admin' | 'driver' | 'barangay' | 'superadmin' | 'hauling_admin' | 'business' | 'ecoaide';
 
 export interface User {
   id: string;
@@ -10,7 +10,9 @@ export interface User {
   avatar?: string;
   barangay?: string;
   phone?: string;
-  truckId?: string; // For drivers
+  truckId?: string;
+  organizationName?: string;
+  vehicleId?: string;
 }
 
 interface AuthContextType {
@@ -34,7 +36,6 @@ const SAMPLE_USERS: Record<string, { password: string; user: User }> = {
       role: 'citizen',
       barangay: 'Brgy. San Jose',
       phone: '0917-XXX-1234',
-      avatar: undefined,
     },
   },
   'admin@juanlesstrash.com': {
@@ -45,7 +46,6 @@ const SAMPLE_USERS: Record<string, { password: string; user: User }> = {
       name: 'Juan Cruz',
       role: 'admin',
       phone: '0918-XXX-5678',
-      avatar: undefined,
     },
   },
   'driver@juanlesstrash.com': {
@@ -57,7 +57,6 @@ const SAMPLE_USERS: Record<string, { password: string; user: User }> = {
       role: 'driver',
       phone: '0919-XXX-9012',
       truckId: 'TRK-247',
-      avatar: undefined,
     },
   },
   'barangay@juanlesstrash.com': {
@@ -69,7 +68,50 @@ const SAMPLE_USERS: Record<string, { password: string; user: User }> = {
       role: 'barangay',
       barangay: 'Brgy. San Jose',
       phone: '0920-XXX-3456',
-      avatar: undefined,
+    },
+  },
+  'superadmin@juanlesstrash.com': {
+    password: 'superadmin123',
+    user: {
+      id: 'sa-001',
+      email: 'superadmin@juanlesstrash.com',
+      name: 'Ricardo Dela Cruz',
+      role: 'superadmin',
+      phone: '0921-XXX-7890',
+    },
+  },
+  'hauling@juanlesstrash.com': {
+    password: 'hauling123',
+    user: {
+      id: 'haul-001',
+      email: 'hauling@juanlesstrash.com',
+      name: 'Carlos Villanueva',
+      role: 'hauling_admin',
+      phone: '0922-XXX-1234',
+      organizationName: 'GreenHaul Services Inc.',
+    },
+  },
+  'business@juanlesstrash.com': {
+    password: 'business123',
+    user: {
+      id: 'biz-001',
+      email: 'business@juanlesstrash.com',
+      name: 'Ana Reyes Trading',
+      role: 'business',
+      phone: '0923-XXX-5678',
+      organizationName: 'Reyes Food Corp.',
+    },
+  },
+  'ecoaide@juanlesstrash.com': {
+    password: 'ecoaide123',
+    user: {
+      id: 'eco-001',
+      email: 'ecoaide@juanlesstrash.com',
+      name: 'Mark Gonzales',
+      role: 'ecoaide',
+      phone: '0924-XXX-9012',
+      vehicleId: 'ECO-105',
+      organizationName: 'GreenHaul Services Inc.',
     },
   },
 };
@@ -83,8 +125,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
-    
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const userRecord = SAMPLE_USERS[email.toLowerCase()];
@@ -106,15 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated: !!user, 
-        login, 
-        logout, 
-        isLoading 
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -128,24 +160,30 @@ export function useAuth() {
   return context;
 }
 
-// Helper to get role display name
 export function getRoleDisplayName(role: UserRole): string {
   const names: Record<UserRole, string> = {
     citizen: 'Citizen',
     admin: 'MENRO Admin',
     driver: 'Truck Driver',
     barangay: 'Barangay Official',
+    superadmin: 'Super Admin',
+    hauling_admin: 'Hauling Org Admin',
+    business: 'Business Organization',
+    ecoaide: 'Eco-Aide',
   };
   return names[role];
 }
 
-// Helper to get role dashboard path
 export function getRoleDashboardPath(role: UserRole): string {
   const paths: Record<UserRole, string> = {
     citizen: '/citizen',
     admin: '/admin',
     driver: '/driver',
     barangay: '/barangay',
+    superadmin: '/superadmin',
+    hauling_admin: '/hauling',
+    business: '/business',
+    ecoaide: '/ecoaide',
   };
   return paths[role];
 }
